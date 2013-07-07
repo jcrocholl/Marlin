@@ -276,9 +276,14 @@
 #endif
 
 // The pullups are needed if you directly connect a mechanical endswitch between the signal and ground pins.
-const bool X_ENDSTOPS_INVERTING = false; // set to true to invert the logic of the endstops.
-const bool Y_ENDSTOPS_INVERTING = false; // set to true to invert the logic of the endstops.
-const bool Z_ENDSTOPS_INVERTING = false; // set to true to invert the logic of the endstops.
+
+// set to true to invert the logic of the endstops.
+const bool X_MAX_INVERTING = false; 
+const bool X_MIN_INVERTING = false;
+const bool Y_MAX_INVERTING = false;
+const bool Y_MIN_INVERTING = false;
+const bool Z_MAX_INVERTING = false;
+const bool Z_MIN_INVERTING = false;   // set to true for a zprobe endstop that is NC
 //#define DISABLE_MAX_ENDSTOPS
 //#define DISABLE_MIN_ENDSTOPS
 
@@ -321,6 +326,10 @@ const bool Z_ENDSTOPS_INVERTING = false; // set to true to invert the logic of t
 #define Y_MIN_POS -90
 #define Z_MAX_POS MANUAL_Z_HOME_POS
 #define Z_MIN_POS 0
+#ifdef DELTA
+  #define R_MAX 90            // maximum usable radius (mm)
+  #define PROBE_FRACTION 85   // fraction of bed to probe (%)
+#endif
 
 #define X_MAX_LENGTH (X_MAX_POS - X_MIN_POS)
 #define Y_MAX_LENGTH (Y_MAX_POS - Y_MIN_POS)
