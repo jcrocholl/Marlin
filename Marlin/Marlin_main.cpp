@@ -911,6 +911,11 @@ void calibrate_print_surface(float z_offset) {
   }
 }
 
+void refresh_cmd_timeout(void)
+{
+  previous_millis_cmd = millis();
+}
+
 void process_commands()
 {
   unsigned long codenum; //throw away variable
