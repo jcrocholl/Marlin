@@ -353,6 +353,11 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 
 #define Z_PROBE_OFFSET {0, 19, -8, 0}  // X, Y, Z, E distance between hotend nozzle and deployed bed leveling probe.
 
+// sequence for Z probe deploy and retract. {X,Y,Z,feedrate [mm/min]}
+// speed is initially HOMING_FEEDRATE[0], when 0 or not compiled, previous or initial speed is used
+#define Z_PROBE_DEPLOY_SEQUENCE  { {25,78,100},{0,78,100,20*60} }
+#define Z_PROBE_RETRACT_SEQUENCE { {0,0,30},{-55,63,30},{-55,63,10,20*60},{-55,63,40,200*60} }
+
 // default settings
 
 #define DEFAULT_AXIS_STEPS_PER_UNIT   {100, 100, 100, 100}

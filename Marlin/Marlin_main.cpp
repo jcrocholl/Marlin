@@ -268,6 +268,10 @@ bool Stopped=false;
 bool CooldownNoWait = true;
 bool target_direction;
 
+struct s_sequence { float x,y,z,f; };
+static struct s_sequence deploy_sequence[]=Z_PROBE_DEPLOY_SEQUENCE;
+static struct s_sequence retract_sequence[]=Z_PROBE_RETRACT_SEQUENCE;
+
 //===========================================================================
 //=============================ROUTINES=============================
 //===========================================================================
@@ -823,39 +827,28 @@ static void homeaxis(int axis) {
 }
 #define HOMEAXIS(LETTER) homeaxis(LETTER##_AXIS)
 
-void deploy_z_probe() {
+void deploy_retract_z_probe(struct s_sequence *seq, int len) {
+  float f=feedrate;
   feedrate = homing_feedrate[X_AXIS];
-  destination[X_AXIS] = 25;
-  destination[Y_AXIS] = 78;
-  destination[Z_AXIS] = 100;
-  prepare_move_raw();
-
-  feedrate = homing_feedrate[X_AXIS]/10;
-  destination[X_AXIS] = 0;
-  prepare_move_raw();
+  for (int i=0; i<len; i++, seq++) {
+    destination[X_AXIS] = seq->x;
+    destination[Y_AXIS] = seq->y;
+    destination[Z_AXIS] = seq->z;
+    if (seq->f) feedrate = seq->f;
+    prepare_move_raw();
+  }
   st_synchronize();
+  feedrate=f;
 }
 
-void retract_z_probe() {
-  feedrate = homing_feedrate[X_AXIS];
-  destination[Z_AXIS] = current_position[Z_AXIS] + 20;
-  prepare_move_raw();
-
-  destination[X_AXIS] = -55;
-  destination[Y_AXIS] = 63;
-  destination[Z_AXIS] = 30;
-  prepare_move_raw();
-
-  // Move the nozzle below the print surface to push the probe up.
-  feedrate = homing_feedrate[Z_AXIS]/10;
-  destination[Z_AXIS] = current_position[Z_AXIS] - 20;
-  prepare_move_raw();
-
-  feedrate = homing_feedrate[Z_AXIS];
-  destination[Z_AXIS] = current_position[Z_AXIS] + 30;
-  prepare_move_raw();
-  st_synchronize();
+void deploy_z_probe() { 
+  deploy_retract_z_probe(deploy_sequence, sizeof(deploy_sequence)/sizeof(*deploy_sequence)); 
 }
+
+void retract_z_probe() { 
+  deploy_retract_z_probe(retract_sequence, sizeof(retract_sequence)/sizeof(*retract_sequence)); 
+}
+
 
 float z_probe() {
   feedrate = homing_feedrate[X_AXIS];
