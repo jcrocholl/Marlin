@@ -1,6 +1,8 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
+#include "MyConfiguration.h"
+
 // This configurtion file contains the basic settings.
 // Advanced settings can be found in Configuration_adv.h 
 // BASIC SETTINGS: select your board type, temperature sensor type, axis scaling, and endstop configuration
@@ -17,8 +19,10 @@
 #define SERIAL_PORT 0
 
 // This determines the communication speed of the printer
-#define BAUDRATE 250000
-//#define BAUDRATE 115200
+#ifndef BAUDRATE
+//#define BAUDRATE 250000
+#define BAUDRATE 115200
+#endif
 
 //// The following define selects which electronics board you have. Please choose the one that matches your setup
 // 10 = Gen7 custom (Alfons3 Version) "https://github.com/Alfons3/Generation_7_Electronics"
@@ -244,10 +248,22 @@
   #define ENDSTOPPULLUP_ZMIN
 #endif
 
+#ifndef X_ENDSTOPS_NC
+#define X_ENDSTOPS_NC false
+#endif
+
+#ifndef Y_ENDSTOPS_NC
+#define Y_ENDSTOPS_NC false
+#endif
+
+#ifndef Z_ENDSTOPS_NC
+#define Z_ENDSTOPS_NC false
+#endif
+
 // The pullups are needed if you directly connect a mechanical endswitch between the signal and ground pins.
-const bool X_ENDSTOPS_INVERTING = false; // set to true to invert the logic of the endstops.
-const bool Y_ENDSTOPS_INVERTING = false; // set to true to invert the logic of the endstops.
-const bool Z_ENDSTOPS_INVERTING = false; // set to true to invert the logic of the endstops.
+const bool X_ENDSTOPS_INVERTING = X_ENDSTOPS_NC;
+const bool Y_ENDSTOPS_INVERTING = Y_ENDSTOPS_NC;
+const bool Z_ENDSTOPS_INVERTING = Z_ENDSTOPS_NC;
 //#define DISABLE_MAX_ENDSTOPS
 
 // For Inverting Stepper Enable Pins (Active Low) use 0, Non Inverting (Active High) use 1
