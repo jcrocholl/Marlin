@@ -3,6 +3,8 @@
 
 // Positive values move the extruder lower
 #define EXTRUDER_Z_OFFSET -6
+#define EXTRUDER_Z_OFFSET 0 // Reset to zero so we keep our dimensions.  FSR's should fix the levelling issue.
+
 #define DELTA_SMOOTH_ROD_OFFSET    (209.55+EXTRUDER_Z_OFFSET)
 #define DELTA_DIAGONAL_ROD        298.45
 #define DELTA_EFFECTOR_OFFSET    25.4

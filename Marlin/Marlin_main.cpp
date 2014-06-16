@@ -883,8 +883,17 @@ static void set_bed_level_equation(float z_at_xLeft_yFront, float z_at_xRight_yF
 }
 #endif // ACCURATE_BED_LEVELING
 
+float fsrBedSample()
+{
+#ifdef FSR_ANALOG_READ
+	return rawBedSample();
+#else
+	return READ(Z_MIN_PIN);
+#endif
+}
+
 bool touching_print_surface(int threshold) {
-  return rawBedSample() < threshold;
+  return fsrBedSample() < threshold;
 }
 
 static void run_z_probe() {
@@ -895,9 +904,14 @@ static void run_z_probe() {
     feedrate = 600; //mm/min
     float step = 0.05;
     int direction = -1;
+#if FSR_ANALOG_READ
     // Consider the glass touched if the raw ADC value is reduced by 5% or more.
-    int analog_fsr_untouched = rawBedSample();
+    int analog_fsr_untouched = fsrBedSample();
     int threshold = analog_fsr_untouched * 95L / 100;
+#else
+	int threshold = 1;
+#endif
+
     while (!touching_print_surface(threshold)) {
       destination[Z_AXIS] += step * direction;
       prepare_move_raw();
@@ -1106,7 +1120,7 @@ static float probe_pt(float x, float y, float z_before) {
   SERIAL_PROTOCOL(measured_z);
 #ifdef FSR_BED_LEVELING
   SERIAL_PROTOCOLPGM(" FSR: ");
-  SERIAL_PROTOCOL(rawBedSample());
+  SERIAL_PROTOCOL(fsrBedSample());
 #endif
   SERIAL_PROTOCOLPGM("\n");
   return measured_z;
@@ -1561,6 +1575,7 @@ void process_commands()
             #error "You must have a Z_MIN endstop in order to enable Auto Bed Leveling feature!!! Z_MIN_PIN must point to a valid hardware pin."
             #endif
 
+
             st_synchronize();
             // make sure the bed_level_rotation_matrix is identity or the planner will get it incorectly
             //vector_3 corrected_position = plan_get_position_mm();
@@ -1631,6 +1646,7 @@ void process_commands()
 
                 float z_before = probePointCounter == 0 ? Z_RAISE_BEFORE_PROBING :
                   current_position[Z_AXIS] + Z_RAISE_BETWEEN_PROBINGS;
+
                 float measured_z = probe_pt(xProbe, yProbe, z_before);
 
                 #ifdef NONLINEAR_BED_LEVELING
