@@ -1,3 +1,19 @@
+/**
+  * MyConfiguration.h.example
+  *
+  * The intention of this file is to contain things particular to your configuration.
+  * Configuration.h is a mixture of logic and settings, and the separation into MyConfiguration.h for
+  * user specifics and Configuration.h for knock-on settings should help make merging easier on people.
+  *
+  * This is an example file, as used by Eddie Parker to drive his board.  More settings may be possible,
+  * peruse the Configuration.h to see what can be overriden in here.  For now, you can copy this file
+  * to MyConfiguration.h, and edit the values as makes sense for you.
+  *
+  * This example is for a deltabot style kossel pro reprap.
+  */
+#ifndef MY_CONFIGURATION_H
+#define MY_CONFIGURATION_H
+
 #define MOTHERBOARD 33  // RAMPS
 #define BAUDRATE 115200 // Seems to cause issues if I go above with the mega.
 
@@ -35,3 +51,5 @@
 #define INVERT_E1_DIR false
 #define INVERT_E2_DIR false
 #define E_STEPS 100
+
+#endif

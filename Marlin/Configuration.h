@@ -1,6 +1,27 @@
+/**
+  * Configuration.h
+  *
+  * Configuration.h is where knock-on settings should be set, and
+  * user settings should be set in MyConfiguration.h.
+  *
+  * i.e., settings that are pertinent to *your* printer should be
+  * set in MyConfiguration.h (which is set to be .gitignored, so
+  * you won't clobber someone elses), and here in Configuration.h
+  * other settings which need to be enabled based on *those* settings
+  * can be set.
+  *
+  * Said differently, people hacking on Marlin may need to edit
+  * Configuration.h, whereas users of Marlin should only have to 
+  * tweak MyConfiguration.h*.
+  *
+  * (*) Footnote: Not every setting has been abstracted into 
+  * MyConfiguration.h yet, so this is not technically true yet.
+  * Feel free to keep cleaning this up in this direction, however!
+  */
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
+// To create MyConfiguration.h the first time, copy MyConfiguration.h.example and start adding/tweaking
 #include "MyConfiguration.h"
 
 // This configuration file contains the basic settings.
