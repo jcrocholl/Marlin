@@ -883,8 +883,34 @@ static void set_bed_level_equation(float z_at_xLeft_yFront, float z_at_xRight_yF
 }
 #endif // ACCURATE_BED_LEVELING
 
-bool touching_print_surface(int threshold) {
-  return rawBedSample() < threshold;
+
+#ifdef FSR_BED_TEMPERATURE
+int bed_sensor_threshold;
+#endif
+
+void setup_bed_sensor_threshold() {
+#ifdef FSR_BED_TEMPERATURE
+  int analog_fsr_untouched = rawBedSample();
+  bed_sensor_threshold = analog_fsr_untouched * 95L / 100;
+#else
+  // nothing needs to be done. This routine sets up a threshold
+#endif
+}
+
+int read_bed_touch() {
+#ifdef FSR_BED_TEMPERATURE
+  return rawBedSample();
+#else
+  return digitalRead(Z_MIN_PIN);
+#endif
+}
+
+bool touching_print_surface() {
+#ifdef FSR_BED_TEMPERATURE
+  return read_bed_touch() < bed_sensor_threshold;
+#else
+  return read_bed_touch();
+#endif
 }
 
 static void run_z_probe() {
@@ -896,9 +922,8 @@ static void run_z_probe() {
     float step = 0.05;
     int direction = -1;
     // Consider the glass touched if the raw ADC value is reduced by 5% or more.
-    int analog_fsr_untouched = rawBedSample();
-    int threshold = analog_fsr_untouched * 95L / 100;
-    while (!touching_print_surface(threshold)) {
+    setup_bed_sensor_threshold();
+    while (!touching_print_surface()) {
       destination[Z_AXIS] += step * direction;
       prepare_move_raw();
       st_synchronize();
@@ -906,12 +931,12 @@ static void run_z_probe() {
     while (step > 0.005) {
       step *= 0.8;
       feedrate *= 0.8;
-      direction = touching_print_surface(threshold) ? 1 : -1;
+      direction = touching_print_surface() ? 1 : -1;
       destination[Z_AXIS] += step * direction;
       prepare_move_raw();
       st_synchronize();
     }
-  #else
+  #else /* FSR_BED_LEVELING */
     enable_endstops(true);
     float start_z = current_position[Z_AXIS];
     long start_steps = st_get_position(Z_AXIS);
@@ -929,8 +954,8 @@ static void run_z_probe() {
     current_position[Z_AXIS] = mm;
     calculate_delta(current_position);
     plan_set_position(delta[X_AXIS], delta[Y_AXIS], delta[Z_AXIS], current_position[E_AXIS]);
-  #endif
-#else
+  #endif  /* FSR_BED_LEVELING */
+#else /* DELTA */
     feedrate = homing_feedrate[Z_AXIS];
 
     // move down until you find the bed
@@ -1106,7 +1131,7 @@ static float probe_pt(float x, float y, float z_before) {
   SERIAL_PROTOCOL(measured_z);
 #ifdef FSR_BED_LEVELING
   SERIAL_PROTOCOLPGM(" FSR: ");
-  SERIAL_PROTOCOL(rawBedSample());
+  SERIAL_PROTOCOL(read_bed_touch());
 #endif
   SERIAL_PROTOCOLPGM("\n");
   return measured_z;
