@@ -15,7 +15,7 @@
 #ifndef __CALIBRATION_H
 #define __CALIBRATION_H
 
-// 
+// This is a RAMPS board
 #define MOTHERBOARD 33
 
 // Define this to set a custom name for your generic Mendel,
@@ -42,7 +42,7 @@
 #define DELTA_CARRIAGE_OFFSET 12.0 // mm
 
 // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
-#define DELTA_PRINTABLE_RADIUS 75.0
+#define DELTA_PRINTABLE_RADIUS 80.0
 
 
 // Stepper Motor And Gear Calibration
@@ -72,9 +72,6 @@
 #define DEFAULT_ZJERK                 2.0    // (mm/sec)
 #define DEFAULT_EJERK                 5.0    // (mm/sec)
 
-//===========================================================================
-//=============================Additional Features===========================
-//===========================================================================
-
+// All remaining calibration options are in the file Configuration.h
 
 #endif //____CALIBRATION_H
