@@ -5,6 +5,9 @@
 // Advanced settings can be found in Configuration_adv.h
 // BASIC SETTINGS: select your board type, temperature sensor type, axis scaling, and endstop configuration
 
+// Use a separate configuration file for your local calibration settings.
+#include "Calibration.h"
+
 //===========================================================================
 //============================= DELTA Printer ===============================
 //===========================================================================
@@ -94,34 +97,48 @@
 // Define this to have the electronics keep the power supply off on startup. If you don't know what this is leave it.
 // #define PS_DEFAULT_OFF
 
-//===========================================================================
-//============================== Delta Settings =============================
-//===========================================================================
-// Enable DELTA kinematics
+
+
 #define DELTA
+
+#ifndef __CALIBRATION_H
+  // Override your calibration settings in Calibration.h
+  
+  //===========================================================================
+  //============================== Delta Settings =============================
+  //===========================================================================
+  // Enable DELTA kinematics
+  
+  // The following values are for a Kossel Air. For sensible starting values
+  // for a Kossel Mini, see Calibration.h
+
+  // Center-to-center distance of the holes in the diagonal push rods.
+  #define DELTA_DIAGONAL_ROD 186.0 // mm
+
+  // Horizontal offset from middle of printer to smooth rod center.
+  #define DELTA_SMOOTH_ROD_OFFSET 128.0 // mm
+
+  // Horizontal offset of the universal joints on the end effector.
+  #define DELTA_EFFECTOR_OFFSET 19.9 // mm
+
+  // Horizontal offset of the universal joints on the carriages.
+  #define DELTA_CARRIAGE_OFFSET 19.5 // mm
+
+  // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
+  #define DELTA_PRINTABLE_RADIUS 75.0
+
+#endif // __CALIBRATION_H 
 
 // Make delta curves from many straight lines (linear interpolation).
 // This is a trade-off between visible corners (not enough segments)
 // and processor overload (too many expensive sqrt calls).
 #define DELTA_SEGMENTS_PER_SECOND 100
 
-// Center-to-center distance of the holes in the diagonal push rods.
-#define DELTA_DIAGONAL_ROD 214.5 // mm
-
-// Horizontal offset from middle of printer to smooth rod center.
-#define DELTA_SMOOTH_ROD_OFFSET 139.0 // mm
-
-// Horizontal offset of the universal joints on the end effector.
-#define DELTA_EFFECTOR_OFFSET 20.0 // mm
-
-// Horizontal offset of the universal joints on the carriages.
-#define DELTA_CARRIAGE_OFFSET 12.0 // mm
-
 // Horizontal distance bridged by diagonal push rods when effector is centered.
 #define DELTA_RADIUS (DELTA_SMOOTH_ROD_OFFSET-DELTA_EFFECTOR_OFFSET-DELTA_CARRIAGE_OFFSET)
 
-// Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
-#define DELTA_PRINTABLE_RADIUS 75.0
+// Diagonal rod squared
+#define DELTA_DIAGONAL_ROD_2 pow(DELTA_DIAGONAL_ROD,2)
 
 // Effective X/Y positions of the three vertical towers.
 #define SIN_60 0.8660254037844386
@@ -133,8 +150,6 @@
 #define DELTA_TOWER3_X 0.0 // back middle tower
 #define DELTA_TOWER3_Y DELTA_RADIUS
 
-// Diagonal rod squared
-#define DELTA_DIAGONAL_ROD_2 pow(DELTA_DIAGONAL_ROD,2)
 
 //===========================================================================
 //=============================Thermal Settings  ============================
@@ -320,7 +335,7 @@
 // The pullups are needed if you directly connect a mechanical endswitch between the signal and ground pins.
 const bool X_MIN_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
 const bool Y_MIN_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
-const bool Z_MIN_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
+const bool Z_MIN_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
 const bool X_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
 const bool Y_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
 const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
@@ -453,15 +468,16 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
   // you will also have to set the following above
   // const bool Z_MIN_ENDSTOP_INVERTING = true; // set to true to invert the logic of the endstop.
   //#define FSR_Z_MIN
-#endif
+#endif  // ENABLE_AUTO_BED_LEVELING
 
 // Do a sanity check to make sure that only one of FSR_Z_MIN or FSR_BED_TEMPERATURE are
 // defined.
 #ifdef FSR_Z_MIN
-#ifdef FSR_BED_TEMPERATURE
-  #error you can only define ONE of FSR_Z_MIN or FSR_BED_TEMPERATURE
-#endif
-#endif
+  const bool Z_MIN_ENDSTOP_INVERTING = true;
+  #ifdef FSR_BED_TEMPERATURE
+    #error you can only define ONE of FSR_Z_MIN or FSR_BED_TEMPERATURE
+  #endif  // FSR_BED_TEMPERATURE
+#endif  // FSR_Z_MIN
 
 // The position of the homing switches
 #define MANUAL_HOME_POSITIONS  // If defined, MANUAL_*_HOME_POS below will be used
@@ -471,37 +487,49 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 // For deltabots this means top and center of the Cartesian print volume.
 #define MANUAL_X_HOME_POS 0
 #define MANUAL_Y_HOME_POS 0
-#define MANUAL_Z_HOME_POS 206.8  // For delta: Distance between nozzle and print surface after homing.
 
+#ifndef MANUAL_Z_HOME_POS
+  #define MANUAL_Z_HOME_POS 210  // For delta: Distance between nozzle and print surface after homing.
+#endif
+  
 //// MOVEMENT SETTINGS
 #define NUM_AXIS 4 // The axis order in all axis related arrays is X, Y, Z, E
 #define HOMING_FEEDRATE {200*60, 200*60, 200*60, 0}  // set the homing speeds (mm/min)
 
 // default settings
 
-#define XYZ_FULL_STEPS_PER_ROTATION 200
-#define XYZ_MICROSTEPS 16
-#define XYZ_BELT_PITCH 2
-#define XYZ_PULLEY_TEETH 16
-#define XYZ_STEPS (0.97 * XYZ_FULL_STEPS_PER_ROTATION * XYZ_MICROSTEPS / double(XYZ_BELT_PITCH) / double(XYZ_PULLEY_TEETH))
+#ifndef __CALIBRATION_H
+  // Override these settings in Calibration.h
+  
+  #define XYZ_FULL_STEPS_PER_ROTATION 200
+  #define XYZ_MICROSTEPS 16
+  #define XYZ_BELT_PITCH 2
+  #define XYZ_PULLEY_TEETH 16
+  
+  #define SCALING_FACTOR 1.0 // Modify this in Calibration.h after you've printed a test cube
+  
+  #define EXTRUDER_STEPS 100
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {XYZ_STEPS, XYZ_STEPS, XYZ_STEPS, 520}
-#define DEFAULT_MAX_FEEDRATE          {200, 200, 200, 200}    // (mm/sec)
-#define DEFAULT_MAX_ACCELERATION      {4500,4500,4500,4500}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
+  #define DEFAULT_MAX_FEEDRATE          {200, 200, 200, 200}    // (mm/sec)
+  #define DEFAULT_MAX_ACCELERATION      {9000,9000,9000,9000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
 
-#define DEFAULT_ACCELERATION          1500    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  3000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
+  #define DEFAULT_ACCELERATION          3000    // X, Y, Z and E max acceleration in mm/s^2 for printing moves
+  #define DEFAULT_RETRACT_ACCELERATION  3000   // X, Y, Z and E max acceleration in mm/s^2 for retracts
 
-// Offset of the extruders (uncomment if using more than one and relying on firmware to position when changing).
-// The offset has to be X=0, Y=0 for the extruder 0 hotend (default extruder).
-// For the other hotends it is their distance from the extruder 0 hotend.
-// #define EXTRUDER_OFFSET_X {0.0, 20.00} // (in mm) for each extruder, offset of the hotend on the X axis
-// #define EXTRUDER_OFFSET_Y {0.0, 5.00}  // (in mm) for each extruder, offset of the hotend on the Y axis
+  // Offset of the extruders (uncomment if using more than one and relying on firmware to position when changing).
+  // The offset has to be X=0, Y=0 for the extruder 0 hotend (default extruder).
+  // For the other hotends it is their distance from the extruder 0 hotend.
+  // #define EXTRUDER_OFFSET_X {0.0, 20.00} // (in mm) for each extruder, offset of the hotend on the X axis
+  // #define EXTRUDER_OFFSET_Y {0.0, 5.00}  // (in mm) for each extruder, offset of the hotend on the Y axis
 
-// The speed change that does not require acceleration (i.e. the software might assume it can be done instantaneously)
-#define DEFAULT_XYJERK                2.0    // (mm/sec)
-#define DEFAULT_ZJERK                 2.0    // (mm/sec)
-#define DEFAULT_EJERK                 5.0    // (mm/sec)
+  // The speed change that does not require acceleration (i.e. the software might assume it can be done instantaneously)
+  #define DEFAULT_XYJERK                20.0    // (mm/sec)
+  #define DEFAULT_ZJERK                 20.0    // (mm/sec)
+  #define DEFAULT_EJERK                 20.0    // (mm/sec)
+#endif /* __CALIBRATION_H */
+  
+#define XYZ_STEPS (SCALING_FACTOR * XYZ_FULL_STEPS_PER_ROTATION * XYZ_MICROSTEPS / double(XYZ_BELT_PITCH) / double(XYZ_PULLEY_TEETH))
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {XYZ_STEPS, XYZ_STEPS, XYZ_STEPS, EXTRUDER_STEPS}
 
 //===========================================================================
 //=============================Additional Features===========================
@@ -639,6 +667,8 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
   #endif
 
 #endif
+
+// Define your LCD version in Calibration.h
 
 // Panucatt VIKI LCD with status LEDs, integrated click & L/R/U/P buttons, separate encoder inputs
 //#define LCD_I2C_VIKI
