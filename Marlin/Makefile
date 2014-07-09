@@ -214,7 +214,6 @@ TARGET = $(notdir $(CURDIR))
 # directory is added here
 
 VPATH = .
-VPATH += ./libraries/Time/Time
 VPATH += $(BUILD_DIR)
 VPATH += $(HARDWARE_SRC)
 ifeq ($(HARDWARE_VARIANT), arduino)
