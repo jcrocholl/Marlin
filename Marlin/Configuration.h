@@ -1,5 +1,28 @@
+/**
+  * Configuration.h
+  *
+  * Configuration.h is where knock-on settings should be set, and
+  * user settings should be set in MyConfiguration.h.
+  *
+  * i.e., settings that are pertinent to *your* printer should be
+  * set in MyConfiguration.h (which is set to be .gitignored, so
+  * you won't clobber someone elses), and here in Configuration.h
+  * other settings which need to be enabled based on *those* settings
+  * can be set.
+  *
+  * Said differently, people hacking on Marlin may need to edit
+  * Configuration.h, whereas users of Marlin should only have to 
+  * tweak MyConfiguration.h*.
+  *
+  * (*) Footnote: Not every setting has been abstracted into 
+  * MyConfiguration.h yet, so this is not technically true yet.
+  * Feel free to keep cleaning this up in this direction, however!
+  */
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
+
+// To create MyConfiguration.h the first time, copy MyConfiguration.h.example and start adding/tweaking
+#include "MyConfiguration.h"
 
 // This configuration file contains the basic settings.
 // Advanced settings can be found in Configuration_adv.h
@@ -24,12 +47,12 @@
 #define SERIAL_PORT 0
 
 // This determines the communication speed of the printer
-// This determines the communication speed of the printer
+#ifndef BAUDRATE
 #define BAUDRATE 250000
+#endif
 
 // This enables the serial port associated to the Bluetooth interface
 //#define BTENABLED              // Enable BT interface on AT90USB devices
-
 
 //// The following define selects which electronics board you have. Please choose the one that matches your setup
 // 10 = Gen7 custom (Alfons3 Version) "https://github.com/Alfons3/Generation_7_Electronics"
@@ -72,7 +95,7 @@
 // 21 = Elefu Ra Board (v3)
 
 #ifndef MOTHERBOARD
-#define MOTHERBOARD 33
+#define MOTHERBOARD 81
 #endif
 
 // Define this to set a custom name for your generic Mendel,
@@ -106,22 +129,32 @@
 #define DELTA_SEGMENTS_PER_SECOND 100
 
 // Center-to-center distance of the holes in the diagonal push rods.
+#ifndef DELTA_DIAGONAL_ROD
 #define DELTA_DIAGONAL_ROD 186.0 // mm
+#endif
 
 // Horizontal offset from middle of printer to smooth rod center.
+#ifndef DELTA_SMOOTH_ROD_OFFSET
 #define DELTA_SMOOTH_ROD_OFFSET 128.0 // mm
+#endif
 
 // Horizontal offset of the universal joints on the end effector.
+#ifndef DELTA_EFFECTOR_OFFSET
 #define DELTA_EFFECTOR_OFFSET 19.9 // mm
+#endif
 
 // Horizontal offset of the universal joints on the carriages.
+#ifndef DELTA_CARRIAGE_OFFSET
 #define DELTA_CARRIAGE_OFFSET 19.5 // mm
+#endif
 
 // Horizontal distance bridged by diagonal push rods when effector is centered.
 #define DELTA_RADIUS (DELTA_SMOOTH_ROD_OFFSET-DELTA_EFFECTOR_OFFSET-DELTA_CARRIAGE_OFFSET)
 
 // Print surface diameter/2 minus unreachable space (avoid collisions with vertical towers).
+#ifndef DELTA_PRINTABLE_RADIUS
 #define DELTA_PRINTABLE_RADIUS 75.0
+#endif
 
 // Effective X/Y positions of the three vertical towers.
 #define SIN_60 0.8660254037844386
@@ -317,13 +350,37 @@
   #define ENDSTOPPULLUP_ZMIN
 #endif
 
+#ifndef X_MIN_ENDSTOP_NO
+#define X_MIN_ENDSTOP_NO false
+#endif
+
+#ifndef Y_MIN_ENDSTOP_NO
+#define Y_MIN_ENDSTOP_NO false
+#endif
+
+#ifndef Z_MIN_ENDSTOP_NO
+#define Z_MIN_ENDSTOP_NO false
+#endif
+
+#ifndef X_MAX_ENDSTOP_NO
+#define X_MAX_ENDSTOP_NO false
+#endif
+
+#ifndef Y_MAX_ENDSTOP_NO
+#define Y_MAX_ENDSTOP_NO false
+#endif
+
+#ifndef Z_MAX_ENDSTOP_NO
+#define Z_MAX_ENDSTOP_NO false
+#endif
+
 // The pullups are needed if you directly connect a mechanical endswitch between the signal and ground pins.
-const bool X_MIN_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
-const bool Y_MIN_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
-const bool Z_MIN_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
-const bool X_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
-const bool Y_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
-const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic of the endstop.
+const bool X_MIN_ENDSTOP_INVERTING = X_MIN_ENDSTOP_NO; // set to true to invert the logic of the endstop.
+const bool Y_MIN_ENDSTOP_INVERTING = Y_MIN_ENDSTOP_NO; // set to true to invert the logic of the endstop.
+const bool Z_MIN_ENDSTOP_INVERTING = Z_MIN_ENDSTOP_NO; // set to true to invert the logic of the endstop.
+const bool X_MAX_ENDSTOP_INVERTING = X_MAX_ENDSTOP_NO; // set to true to invert the logic of the endstop.
+const bool Y_MAX_ENDSTOP_INVERTING = Y_MAX_ENDSTOP_NO; // set to true to invert the logic of the endstop.
+const bool Z_MAX_ENDSTOP_INVERTING = Z_MAX_ENDSTOP_NO; // set to true to invert the logic of the endstop.
 //#define DISABLE_MAX_ENDSTOPS
 //#define DISABLE_MIN_ENDSTOPS
 
@@ -347,15 +404,32 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #define INVERT_X_DIR false    // for Mendel set to false, for Orca set to true
 #define INVERT_Y_DIR false    // for Mendel set to true, for Orca set to false
 #define INVERT_Z_DIR false    // for Mendel set to false, for Orca set to true
+
+#ifndef INVERT_E0_DIR
 #define INVERT_E0_DIR false   // for direct drive extruder v9 set to true, for geared extruder set to false
+#endif
+
+#ifndef INVERT_E1_DIR
 #define INVERT_E1_DIR false   // for direct drive extruder v9 set to true, for geared extruder set to false
+#endif
+
+#ifndef INVERT_E2_DIR
 #define INVERT_E2_DIR false   // for direct drive extruder v9 set to true, for geared extruder set to false
+#endif
 
 // ENDSTOP SETTINGS:
 // Sets direction of endstops when homing; 1=MAX, -1=MIN
+#ifndef X_HOME_DIR
 #define X_HOME_DIR 1
+#endif
+
+#ifndef Y_HOME_DIR
 #define Y_HOME_DIR 1
+#endif 
+
+#ifndef Z_HOME_DIR
 #define Z_HOME_DIR 1
+#endif
 
 #define min_software_endstops true // If true, axis won't move to coordinates less than HOME_POS.
 #define max_software_endstops true  // If true, axis won't move to coordinates greater than the defined lengths below.
@@ -453,21 +527,42 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 // For deltabots this means top and center of the Cartesian print volume.
 #define MANUAL_X_HOME_POS 0
 #define MANUAL_Y_HOME_POS 0
+
+#ifndef MANUAL_Z_HOME_POS
 #define MANUAL_Z_HOME_POS 210  // For delta: Distance between nozzle and print surface after homing.
+#endif
 
 //// MOVEMENT SETTINGS
 #define NUM_AXIS 4 // The axis order in all axis related arrays is X, Y, Z, E
+#ifndef HOMING_FEEDRATE
 #define HOMING_FEEDRATE {200*60, 200*60, 200*60, 0}  // set the homing speeds (mm/min)
+#endif
 
 // default settings
 
+#ifndef XYZ_FULL_STEPS_PER_ROTATION
 #define XYZ_FULL_STEPS_PER_ROTATION 200
+#endif
+
+#ifndef XYZ_MICROSTEPS
 #define XYZ_MICROSTEPS 16
+#endif
+
+#ifndef XYZ_BELT_PITCH
 #define XYZ_BELT_PITCH 2
+#endif
+
+#ifndef XYZ_PULLEY_TEETH
 #define XYZ_PULLEY_TEETH 17
+#endif
+
 #define XYZ_STEPS (XYZ_FULL_STEPS_PER_ROTATION * XYZ_MICROSTEPS / double(XYZ_BELT_PITCH) / double(XYZ_PULLEY_TEETH))
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {XYZ_STEPS, XYZ_STEPS, XYZ_STEPS, 100}
+#ifndef E_STEPS
+#define E_STEPS 93.5
+#endif
+
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {XYZ_STEPS, XYZ_STEPS, XYZ_STEPS, E_STEPS }
 #define DEFAULT_MAX_FEEDRATE          {200, 200, 200, 200}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {9000,9000,9000,9000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
 
@@ -623,7 +718,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #endif
 
 // Panucatt VIKI LCD with status LEDs, integrated click & L/R/U/P buttons, separate encoder inputs
-#define LCD_I2C_VIKI
+//#define LCD_I2C_VIKI
 #ifdef LCD_I2C_VIKI
   // This uses the LiquidTWI2 library v1.2.3 or later ( https://github.com/lincomatic/LiquidTWI2 )
   // Make sure the LiquidTWI2 directory is placed in the Arduino or Sketchbook libraries subdirectory.
