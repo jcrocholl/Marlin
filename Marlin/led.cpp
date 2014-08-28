@@ -1,3 +1,5 @@
+#ifdef LEDS
+
 #include "led.h"
 #include "temperature.h"
 
@@ -5,13 +7,17 @@
 Adafruit_NeoPixel gNeoPixelStrip = Adafruit_NeoPixel(60, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 #define NEOPIXEL_EFFECT_SOLID_COLOR 0
+#define NEOPIXEL_EFFECT_CHASER 1
 
-#define NEOPIXEL_PULSE_PERIOD 100
+#define NEOPIXEL_PULSE_HERTZ 5
 #define NEOPIXEL_PULSE_LOW_BRIGHTNESS 150
 #define NEOPIXEL_PULSE_HIGH_BRIGHTNESS 255
+#define NEOPIXEL_UPDATE_FREQUENCY_MILLIS 75;
+
 
 void setup_led()
 {
+	//SERIAL_ECHOLN("LEDs initialized.");
 	gNeoPixelStrip.begin();
 	gNeoPixelStrip.show(); // Set to off.
 }
@@ -41,7 +47,7 @@ int gSizeOfColourLookUp = sizeof(gColourLookUp)/4/sizeof(uint8_t);
 
 void PrintColourLookUpData(String name, uint8_t* pColourData)
 {
-	SERIAL_ECHOLN(name + ": (" + pColourData[COLOUR_INDEX_R] + ", " + pColourData[COLOUR_INDEX_G] + ", " + pColourData[COLOUR_INDEX_B] + ")\n");
+	//SERIAL_ECHOLN(name + ": (" + pColourData[COLOUR_INDEX_R] + ", " + pColourData[COLOUR_INDEX_G] + ", " + pColourData[COLOUR_INDEX_B] + ")\n");
 }
 
 uint32_t GetColourForTemperature(int temperature)
@@ -78,9 +84,9 @@ uint32_t GetColourForTemperature(int temperature)
 	// If you don't guard against this, you get divide by zero blamminess.
 	if(pPreviousData[TEMPERATURE_INDEX] != pNextData[TEMPERATURE_INDEX])
 	{
-		r = map(temperature, pPreviousData[TEMPERATURE_INDEX], pNextData[TEMPERATURE_INDEX], pPreviousData[COLOUR_INDEX_R], pNextData[COLOUR_INDEX_R]);
-		g = map(temperature, pPreviousData[TEMPERATURE_INDEX], pNextData[TEMPERATURE_INDEX], pPreviousData[COLOUR_INDEX_G], pNextData[COLOUR_INDEX_G]);
-		b = map(temperature, pPreviousData[TEMPERATURE_INDEX], pNextData[TEMPERATURE_INDEX], pPreviousData[COLOUR_INDEX_B], pNextData[COLOUR_INDEX_B]);
+		r = constrain(map(temperature, pPreviousData[TEMPERATURE_INDEX], pNextData[TEMPERATURE_INDEX], pPreviousData[COLOUR_INDEX_R], pNextData[COLOUR_INDEX_R]), 0, 255);
+		g = constrain(map(temperature, pPreviousData[TEMPERATURE_INDEX], pNextData[TEMPERATURE_INDEX], pPreviousData[COLOUR_INDEX_G], pNextData[COLOUR_INDEX_G]), 0, 255);
+		b = constrain(map(temperature, pPreviousData[TEMPERATURE_INDEX], pNextData[TEMPERATURE_INDEX], pPreviousData[COLOUR_INDEX_B], pNextData[COLOUR_INDEX_B]), 0, 255);
 	}
 
 /*
@@ -95,6 +101,9 @@ uint32_t GetColourForTemperature(int temperature)
 	return colour;
 }
 
+
+int gLastPixelUpdated = 0;
+
 /**
   * Set the neo pixels according to colour. 
   */
@@ -103,10 +112,38 @@ void SetNeoPixelsTemperature(int temperature, byte effect)
 	switch(effect)
 	{
 		default:
+		/*
 			SERIAL_ECHOLN("Unsupported effect " + String(effect) + " requested.  Defaulting to NEOPIXEL_EFFECT_SOLID_COLOR.");
+			*/
+		case NEOPIXEL_EFFECT_CHASER:
+			{
+				unsigned int time = millis();
+
+				float lowBrightness = (255-NEOPIXEL_PULSE_LOW_BRIGHTNESS)/255.0f;
+				float highBrightness = (255-NEOPIXEL_PULSE_HIGH_BRIGHTNESS)/255.0f;
+
+				float percentBrightness = (sin(time*3.14 * NEOPIXEL_PULSE_HERTZ)*50+50)/100.0f;
+
+				float brightness = 1;
+				//float brightness = (percentBrightness * (highBrightness-lowBrightness)) + lowBrightness;
+
+				//gNeoPixelStrip.setBrightness(brightness);
+
+				uint32_t colour = GetColourForTemperature(temperature)*brightness;
+				gNeoPixelStrip.setPixelColor(gLastPixelUpdated, colour);
+
+				gLastPixelUpdated++;
+				if(gLastPixelUpdated >= 60)
+					gLastPixelUpdated = 0;
+
+				gNeoPixelStrip.show();
+			}
+			break;
 		case NEOPIXEL_EFFECT_SOLID_COLOR:
 			{
-				uint8_t brightness = map(sin(millis()/NEOPIXEL_PULSE_PERIOD)*100, -100, 100, NEOPIXEL_PULSE_LOW_BRIGHTNESS, NEOPIXEL_PULSE_HIGH_BRIGHTNESS);
+				unsigned int time = millis();
+
+				uint8_t brightness = map(sin(time*3.14 * NEOPIXEL_PULSE_HERTZ)*100, -100, 100, NEOPIXEL_PULSE_LOW_BRIGHTNESS, NEOPIXEL_PULSE_HIGH_BRIGHTNESS);
 				gNeoPixelStrip.setBrightness(brightness);
 
 				uint32_t colour = GetColourForTemperature(temperature);
@@ -120,9 +157,18 @@ void SetNeoPixelsTemperature(int temperature, byte effect)
 	}
 }
 
+int gNextNeoPixelUpdate = 0;
 void led_update()
 {
-	// TODO: Parameterize the extruder temperature we care about.
-	SetNeoPixelsTemperature(degHotend(0), NEOPIXEL_EFFECT_SOLID_COLOR);
+	unsigned long time = millis();
+	if(gNextNeoPixelUpdate < time)
+	{
+		gNextNeoPixelUpdate = time + NEOPIXEL_UPDATE_FREQUENCY_MILLIS;
+		// TODO: Parameterize the extruder temperature we care about.
+		//SetNeoPixelsTemperature(degHotend(0), NEOPIXEL_EFFECT_CHASER);
+		SetNeoPixelsTemperature(degHotend(0), NEOPIXEL_EFFECT_SOLID_COLOR);
+	}
 }
 
+
+#endif // LEDS

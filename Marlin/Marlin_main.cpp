@@ -48,6 +48,11 @@
 #include "pins_arduino.h"
 #include "math.h"
 
+#ifdef LEDS
+	#include "led.h"
+#endif
+
+
 #ifdef BLINKM
 #include "BlinkM.h"
 #include "Wire.h"
@@ -499,6 +504,10 @@ void setup()
   #ifdef DIGIPOT_I2C
     digipot_i2c_init();
   #endif
+
+  #ifdef LEDS
+	  setup_led();
+  #endif
 }
 
 
@@ -547,6 +556,10 @@ void loop()
   manage_inactivity();
   checkHitEndstops();
   lcd_update();
+
+  #ifdef LEDS
+	  led_update();
+  #endif
 }
 
 void get_command()
