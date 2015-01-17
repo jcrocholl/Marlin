@@ -18,7 +18,7 @@
 #define BAUDRATE 115200 // Seems to cause issues if I go above with the mega.
 
 // Positive values move the extruder lower
-#define EXTRUDER_Z_OFFSET 0 // Reset to zero so we keep our dimensions.  FSR's should fix the levelling issue.
+#define EXTRUDER_Z_OFFSET -5 // FSR's may fix this later, but for now letsee if I can get figure out my bowing.
 
 #define DELTA_SMOOTH_ROD_OFFSET    (209.55+EXTRUDER_Z_OFFSET)
 #define DELTA_DIAGONAL_ROD        298.45
@@ -42,7 +42,8 @@
 #define XYZ_BELT_PITCH 2
 #define XYZ_PULLEY_TEETH 20
 
-#define  MANUAL_Z_HOME_POS 298.7 // Distance between nozzle and printer
+//#define MANUAL_Z_HOME_POS 286.5 // Distance between nozzle and printer
+#define MANUAL_Z_HOME_POS 292.5
 
 #define HOMING_FEEDRATE {150*60, 150*60, 150*60, 0}  // set the homing speeds (mm/min)
 
@@ -50,6 +51,8 @@
 #define INVERT_E1_DIR false
 #define INVERT_E2_DIR false
 #define E_STEPS 500
+
+#define Z_PROBE_OFFSET_FROM_EXTRUDER .58
 
 //#define LEDS
 //#define NEOPIXEL_PIN 3
