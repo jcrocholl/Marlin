@@ -550,7 +550,7 @@
     #define TC1                4    // ANALOG NUMBERING Thermo couple on Azteeg X3Pro
     #define TC2                5    // ANALOG NUMBERING Thermo couple on Azteeg X3Pro
   #else
-    #define TEMP_2_PIN         -1   // ANALOG NUMBERING
+    #define TEMP_2_PIN         15   // ANALOG NUMBERING
   #endif
 
   #if MOTHERBOARD == 35

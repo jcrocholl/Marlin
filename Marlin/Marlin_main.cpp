@@ -890,7 +890,8 @@ int bed_sensor_threshold;
 
 void setup_bed_sensor_threshold() {
 #ifdef FSR_BED_TEMPERATURE
-  int analog_fsr_untouched = rawBedSample();
+  
+  int analog_fsr_untouched = rawFSRSample();
   bed_sensor_threshold = analog_fsr_untouched * 95L / 100;
 #else
   // nothing needs to be done. This routine sets up a threshold
@@ -899,7 +900,7 @@ void setup_bed_sensor_threshold() {
 
 int read_bed_touch() {
 #ifdef FSR_BED_TEMPERATURE
-  return rawBedSample();
+  return rawFSRSample();
 #else
   return digitalRead(Z_MIN_PIN);
 #endif
@@ -2009,7 +2010,11 @@ void process_commands()
           SERIAL_PROTOCOL_F(degBed(),1);
           SERIAL_PROTOCOLPGM(" /");
           SERIAL_PROTOCOL_F(degTargetBed(),1);
-        #endif //TEMP_BED_PIN
+        #endif //TEMP_2_PIN
+        #if defined(TEMP_2_PIN) && TEMP_2_PIN > -1
+          SERIAL_PROTOCOLPGM(" T2:");
+          SERIAL_PROTOCOL(rawFSRSample());
+        #endif //TEMP_2_PIN
         for (int8_t cur_extruder = 0; cur_extruder < EXTRUDERS; ++cur_extruder) {
           SERIAL_PROTOCOLPGM(" T");
           SERIAL_PROTOCOL(cur_extruder);
@@ -2044,7 +2049,7 @@ void process_commands()
             SERIAL_PROTOCOLPGM("    ADC B:");
             SERIAL_PROTOCOL_F(degBed(),1);
             SERIAL_PROTOCOLPGM("C->");
-            SERIAL_PROTOCOL_F(rawBedTemp()/OVERSAMPLENR,0);
+            SERIAL_PROTOCOL_F(rawBedTemp(),0);
           #endif
           for (int8_t cur_extruder = 0; cur_extruder < EXTRUDERS; ++cur_extruder) {
             SERIAL_PROTOCOLPGM("  T");

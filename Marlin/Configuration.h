@@ -187,9 +187,9 @@
 // 110 is Pt100 with 1k pullup (non standard)
 
 #define TEMP_SENSOR_0 5
-#define TEMP_SENSOR_1 0
-#define TEMP_SENSOR_2 0
-#define TEMP_SENSOR_BED 2
+#define TEMP_SENSOR_1 1
+#define TEMP_SENSOR_2 2
+#define TEMP_SENSOR_BED 1
 
 // This makes temp sensor 1 a redundant sensor for sensor 0. If the temperatures difference between these sensors is to high the print will be aborted.
 //#define TEMP_SENSOR_1_AS_REDUNDANT
@@ -462,7 +462,7 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
   // Define this if you wish to use the bed temperature analog input to read the FSR
   // This is called TEMP_1_PIN
   #define FSR_BED_TEMPERATURE
-  
+  #define FSR_TEMP_SENSOR_2
   // Define FSR_Z_MIN to use the Z_MIN digital input as the bed sensor
   // Check your readings using M119 before trying automatic leveling using Z_MIN
   // you will also have to set the following above
@@ -479,6 +479,13 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
   #endif  // FSR_BED_TEMPERATURE
 #endif  // FSR_Z_MIN
 
+#ifdef FSR_TEMP_SENSOR_2
+  #ifndef TEMP_2_PIN
+    #warning You must define TEMP_2_PIN if FSR_TEMP_SENSOR_2 is defined
+#define TEMP_2_PIN 15 //Analog numbering
+  #endif
+#endif
+  
 // The position of the homing switches
 #define MANUAL_HOME_POSITIONS  // If defined, MANUAL_*_HOME_POS below will be used
 #define BED_CENTER_AT_0_0  // If defined, the center of the bed is at (X=0, Y=0)

@@ -43,6 +43,8 @@ int current_temperature_raw[EXTRUDERS] = { 0 };
 float current_temperature[EXTRUDERS] = { 0.0 };
 int current_temperature_bed_raw = 0;
 int raw_temp_bed_sample = 0;
+int raw_temp_1_sample = 0;
+int raw_temp_2_sample = 0;
 float current_temperature_bed = 0.0;
 #ifdef TEMP_SENSOR_1_AS_REDUNDANT
   int redundant_temperature_raw = 0;
@@ -1159,7 +1161,8 @@ ISR(TIMER0_COMPB_vect)
       break;
     case 5: // Measure TEMP_1
       #if defined(TEMP_1_PIN) && (TEMP_1_PIN > -1)
-        raw_temp_1_value += ADC;
+	raw_temp_1_sample = ADC;
+        raw_temp_1_value += raw_temp_1_sample;
       #endif
       temp_state = 6;
       break;
@@ -1178,7 +1181,8 @@ ISR(TIMER0_COMPB_vect)
       break;
     case 7: // Measure TEMP_2
       #if defined(TEMP_2_PIN) && (TEMP_2_PIN > -1)
-        raw_temp_2_value += ADC;
+       raw_temp_2_sample = ADC;
+       raw_temp_2_value += raw_temp_2_sample;
       #endif
       temp_state = 0;
       temp_count++;

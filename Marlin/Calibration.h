@@ -27,7 +27,7 @@
 
 // First thing to calibrate is the manual home position
 // For delta: Distance between nozzle and print surface after homing.
-#define MANUAL_Z_HOME_POS 206.8  
+#define MANUAL_Z_HOME_POS 204.1  
 
 // Center-to-center distance of the holes in the diagonal push rods.
 #define DELTA_DIAGONAL_ROD 214.5 // mm
@@ -58,7 +58,7 @@
 
 // During extruder calibration, modify this value so that
 // the extruder extrudes the correct length.
-#define EXTRUDER_STEPS 520
+#define EXTRUDER_STEPS 450
 
 #define DEFAULT_MAX_FEEDRATE          {200, 200, 200, 200}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {4500,4500,4500,4500}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
