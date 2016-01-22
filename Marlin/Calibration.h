@@ -27,7 +27,7 @@
 
 // First thing to calibrate is the manual home position
 // For delta: Distance between nozzle and print surface after homing.
-#define MANUAL_Z_HOME_POS 204.1  
+#define MANUAL_Z_HOME_POS 200.1  
 
 // Center-to-center distance of the holes in the diagonal push rods.
 #define DELTA_DIAGONAL_ROD 214.5 // mm
