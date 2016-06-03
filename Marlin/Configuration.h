@@ -504,7 +504,20 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 #define XYZ_PULLEY_TEETH 20
 #define XYZ_STEPS (XYZ_FULL_STEPS_PER_ROTATION * XYZ_MICROSTEPS / double(XYZ_BELT_PITCH) / double(XYZ_PULLEY_TEETH))
 
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {XYZ_STEPS, XYZ_STEPS, XYZ_STEPS, 170}
+// This E_STEPS calculation will result in an extrusion multiplier of 1 in slicer.
+// Use E_HOB_DIAM = 11.98343 to get original Kossel result of 170 E_STEPS.
+// Set both E_BIG_GEAR_TEETH and E_SMALL_GEAR_TEETH to 1 for direct drive stepper.
+// For geared stepper set gearing ratio as E_BIG_GEAR_TEETH:E_SMALL_GEAR_TEETH, i.e. for Classic Wade of 39:11, set E_BIG_GEAR_TEETH = 39, E_SMALL_GEAR_TEETH = 11.
+// See http://reprap.org/wiki/Drive-gear for hobbed gear diameters
+// See http://reprap.org/wiki/Triffid_Hunter%27s_Calibration_Guide for source of formula
+#define E_FULL_STEPS_PER_ROTATION 200
+#define E_MICROSTEPS 32
+#define E_HOB_DIAM 11.4
+#define E_BIG_GEAR_TEETH 1
+#define E_SMALL_GEAR_TEETH 1
+#define E_STEPS ((E_FULL_STEPS_PER_ROTATION * E_MICROSTEPS) * (E_BIG_GEAR_TEETH / double(E_SMALL_GEAR_TEETH)) / (double(E_HOB_DIAM) * double(3.14159265)))
+
+#define DEFAULT_AXIS_STEPS_PER_UNIT   {XYZ_STEPS, XYZ_STEPS, XYZ_STEPS, E_STEPS}
 #define DEFAULT_MAX_FEEDRATE          {200, 200, 200, 200}    // (mm/sec)
 #define DEFAULT_MAX_ACCELERATION      {9000,9000,9000,9000}    // X, Y, Z, E maximum start speed for accelerated moves. E default values are good for skeinforge 40+, for older versions raise them a lot.
 
